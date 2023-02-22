@@ -37,8 +37,6 @@ server.listen(PORT, () =>{
 const express = require('express');
 const app = express();
 const port = 3000;
-const path = require('path');
-const fs = require('fs');
 
 // Define constructor function to ensure data follows same format
 function Movie(title, poster_path, overview) {
@@ -49,25 +47,15 @@ function Movie(title, poster_path, overview) {
 
 // Define home page endpoint
 app.get('/', (req, res) => {
-  // Read JSON data from file
-  fs.readFile(path.join(__dirname, 'data.json'), 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send({
-        status: 500,
-        responseText: 'Sorry, something went wrong'
-      });
-      return;
-    }
-    // Parse JSON data and create Movie object
-    const movieData = JSON.parse(data);
-    const movie = new Movie(
-      movieData.title,
-      movieData.poster_path,
-      movieData.overview
-    );
-    res.send(movie);
-  });
+  // Load data from JSON file
+  const movieData = require('./data.json');
+  // Create Movie object
+  const movie = new Movie(
+    movieData.title,
+    movieData.poster_path,
+    movieData.overview
+  );
+  res.send(movie);
 });
 
 // Define favorite page endpoint
