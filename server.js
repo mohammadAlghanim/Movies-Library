@@ -102,6 +102,9 @@ function Movie(id, title, release_date, poster_path, overview) {
 app.get('/', homeMov)
 app.get('/favorite', favMov)
 app.get('/trending', trending)
+app.get("/search", getSearch)
+app.get('/genre', getGenre)
+app.get("/person", getPerson);
 app.get('*', defaltHandler)
 
 function homeMov(req, res) {
@@ -149,7 +152,68 @@ function trending(req, res) {
     res.status(500).send({ error: "Sorry, an error occurred." });
   }
 }
+const searchURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.APIKey}&language=en-US&query=The%20Hateful%20Eight&page=1`;
 
+function getSearch(req, res) {
+  try {
+    axios
+      .get(searchURL)
+      .then((response) => {
+        const newMoveis = response.data.results.map(
+          (e) =>
+            (e = new Movie(
+              e.id,
+              e.title,
+              e.release_date,
+              e.poster_path,
+              e.overview,
+              e.name
+            ))
+        );
+
+        res.json(newMoveis);
+      })
+      .catch((e) => console.log(e.message));
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+}
+const genreURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.APIKey}&language=en`;
+
+
+function getGenre(req, res) {
+  try {
+    axios
+      .get(genreURL)
+      .then((response) => {
+        res.json(response.data);
+      })
+      .catch((e) => console.log(e.message));
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+}
+const personURL = `https://api.themoviedb.org/3/person/10859?api_key=${process.env.APIKey}&language=en`;
+
+function getPerson(req, res) {
+  try {
+    axios
+      .get(personURL)
+      .then((response) => {
+        res.json(
+          new Movie(
+            response.data.id,
+            response.data.name,
+            response.data.birthday,
+            response.data.biography
+          )
+        );
+      })
+      .catch((e) => console.log(e.message));
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+}
 
 function defaltHandler(req, res) {
   res.status(404).send("Not found.");
