@@ -86,9 +86,12 @@ const app = express();
 const port = 4000;
 const movieData = require('./data.json');
 const axios = require('axios');
+const pg = require('pg');
 require('dotenv').config();
 app.use(cors());
+app.use(express.json());
 app.use(errorHandler);
+const client = new pg.Client(process.env.DATABASE_URL);
 
 // Define constructor function to ensure data follows same format
 function Movie(id, title, release_date, poster_path, overview) {
@@ -104,6 +107,8 @@ app.get('/favorite', favMov)
 app.get('/trending', trending)
 app.get("/search", getSearch)
 app.get('/genre', getGenre)
+app.get("/getMovie", getMovies);
+app.post("/getMovie",addMovies);
 app.get("/person", getPerson);
 app.get('*', defaltHandler)
 
@@ -193,6 +198,28 @@ function getGenre(req, res) {
     errorHandler(error, req, res);
   }
 }
+
+function getMovies(req, res) {
+  const sql = `SELECT * FROM movies`;
+  client
+    .query(sql)
+    .then((data) => {
+      res.send(data.rows);
+    })
+    .catch((err) => {
+      errorHandler(err, req, res);
+    });
+}
+function addMovies(req,res){
+  const movie = req.body;
+  const sqlUrl = `INSERT INTO movies (title,release_date,poster_path,overview) VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}') RETURNING *;`;
+  client
+    .query(sqlUrl)
+    .then((data) => {
+      res.send(data.rows);
+    })
+    .catch((err) => console.log(err.message));
+}
 const personURL = `https://api.themoviedb.org/3/person/10859?api_key=${process.env.APIKey}&language=en`;
 
 function getPerson(req, res) {
@@ -226,7 +253,9 @@ function errorHandler(error, req, res, next) {
   };
   res.status(500).send(err);
 }
-
+client.connect()
+.then(()=>{
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+})
