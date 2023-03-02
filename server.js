@@ -109,6 +109,9 @@ app.get("/search", getSearch)
 app.get('/genre', getGenre)
 app.get("/getMovie", getMovies);
 app.post("/getMovie",addMovies);
+app.get("/getMovie/:id", getOneMovie);
+app.put("/updateMovie/:id", updateMovie);
+app.delete("/deleteMovie/:id", deleteMovie);
 app.get("/person", getPerson);
 app.get('*', defaltHandler)
 
@@ -220,6 +223,38 @@ function addMovies(req,res){
     })
     .catch((err) => console.log(err.message));
 }
+
+function getOneMovie(req, res) {
+  const id = req.params.id;
+  const sqlQuery = `SELECT * FROM movies WHERE id=${id};`;
+  client
+    .query(sqlQuery)
+    .then((data) => res.send(data.rows))
+    .catch((err) => errorHandler(err, req, res));
+}
+function updateMovie(req, res) {
+  const id = req.params.id;
+  const newData = req.body;
+  const sqlQuery = `UPDATE movies SET title='${newData.title}', release_date='${newData.release_date}', poster_path='${newData.poster_path}',overview='${newData.overview}'  WHERE id=${id};`;
+  client
+    .query(sqlQuery)
+    .then((data) => res.status(200).json(data.rows))
+    .catch((err) => errorHandler(err, req, res));
+}
+
+function deleteMovie(req, res) {
+  const id = req.params.id;
+  const sql = `DELETE FROM movies WHERE id=${id};`;
+  client
+    .query(sql)
+    .then((data) => {
+      res.status(204).json({});
+    })
+    .catch((err) => {
+      errorHandler(err, req, res);
+    });
+}
+
 const personURL = `https://api.themoviedb.org/3/person/10859?api_key=${process.env.APIKey}&language=en`;
 
 function getPerson(req, res) {
