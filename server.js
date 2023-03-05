@@ -83,7 +83,7 @@ app.listen(port, () => {
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 4000;
+const PORT = process.env.PORT;
 const movieData = require('./data.json');
 const axios = require('axios');
 const pg = require('pg');
@@ -290,7 +290,7 @@ function errorHandler(error, req, res, next) {
 }
 client.connect()
 .then(()=>{
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Example app listening at http://localhost:${PORT}`);
 });
 })
