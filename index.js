@@ -83,14 +83,13 @@ app.listen(port, () => {
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 const movieData = require('./data.json');
 const axios = require('axios');
 const pg = require('pg');
 require('dotenv').config();
 app.use(cors());
 app.use(express.json());
-app.use(errorHandler);
 const client = new pg.Client(process.env.DATABASE_URL);
 
 // Define constructor function to ensure data follows same format
@@ -114,6 +113,7 @@ app.put("/updateMovie/:id", updateMovie);
 app.delete("/deleteMovie/:id", deleteMovie);
 app.get("/person", getPerson);
 app.get('*', defaltHandler)
+app.use(errorHandler);
 
 function homeMov(req, res) {
   // Create Movie object
@@ -235,7 +235,7 @@ function getOneMovie(req, res) {
 function updateMovie(req, res) {
   const id = req.params.id;
   const newData = req.body;
-  const sqlQuery = `UPDATE movies SET title='${newData.title}', release_date='${newData.release_date}', poster_path='${newData.poster_path}',overview='${newData.overview}'  WHERE id=${id};`;
+  const sqlQuery = `UPDATE movies SET title='${newData.title}', release_date='${newData.release_date}', poster_path='${newData.poster_path}',overview='${newData.overview}'  WHERE id=${id} RETURNING *;`;
   client
     .query(sqlQuery)
     .then((data) => res.status(200).json(data.rows))
