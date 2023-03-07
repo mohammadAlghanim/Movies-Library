@@ -83,11 +83,12 @@ app.listen(port, () => {
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 4000;
-const movieData = require('./data.json');
-const axios = require('axios');
 const pg = require('pg');
 require('dotenv').config();
+const PORT = process.env.PORT;
+const movieData = require('./data.json');
+const axios = require('axios');
+
 app.use(cors());
 app.use(express.json());
 const client = new pg.Client(process.env.DATABASE_URL);
