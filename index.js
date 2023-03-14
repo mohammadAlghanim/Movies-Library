@@ -216,7 +216,7 @@ function getMovies(req, res) {
 }
 function addMovies(req,res){
   const movie = req.body;
-  const sqlUrl = `INSERT INTO movies (title,release_date,poster_path,overview) VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}') RETURNING *;`;
+  const sqlUrl = `INSERT INTO movies (title,release_date,poster_path,overview,comment) VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`;
   client
     .query(sqlUrl)
     .then((data) => {
