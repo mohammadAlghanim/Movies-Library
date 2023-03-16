@@ -214,6 +214,8 @@ function getMovies(req, res) {
       errorHandler(err, req, res);
     });
 }
+
+
 function addMovies(req,res){
   const movie = req.body;
   const sqlUrl = `INSERT INTO movies (title,release_date,poster_path,overview,comment) VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`;
@@ -236,7 +238,7 @@ function getOneMovie(req, res) {
 function updateMovie(req, res) {
   const id = req.params.id;
   const newData = req.body;
-  const sqlQuery = `UPDATE movies SET title='${newData.title}', release_date='${newData.release_date}', poster_path='${newData.poster_path}',overview='${newData.overview}'  WHERE id=${id} RETURNING *;`;
+  const sqlQuery = `UPDATE movies SET comment='${newData.comment}' WHERE id=${id} RETURNING *;`;
   client
     .query(sqlQuery)
     .then((data) => res.status(200).json(data.rows))
