@@ -262,9 +262,17 @@ function deleteMovie(req, res) {
   const sql = `DELETE FROM movies WHERE id=${id};`;
   client
     .query(sql)
+    .then((data) =>{
+      const sql = `SELECT * FROM movies`;
+  client.query(sql)
     .then((data) => {
-      res.status(204).json({});
+      res.send(data.rows);
     })
+    .catch((err) => {
+      errorHandler(err, req, res);
+    });
+      
+})
     .catch((err) => {
       errorHandler(err, req, res);
     });
