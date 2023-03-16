@@ -239,9 +239,21 @@ function updateMovie(req, res) {
   const id = req.params.id;
   const newData = req.body;
   const sqlQuery = `UPDATE movies SET comment='${newData.comment}' WHERE id=${id} RETURNING *;`;
+
   client
     .query(sqlQuery)
-    .then((data) => res.status(200).json(data.rows))
+
+    .then((data) =>{
+      const sql = `SELECT * FROM movies`;
+  client.query(sql)
+    .then((data) => {
+      res.send(data.rows);
+    })
+    .catch((err) => {
+      errorHandler(err, req, res);
+    });
+      
+})
     .catch((err) => errorHandler(err, req, res));
 }
 
